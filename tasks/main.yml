@@ -1,0 +1,134 @@
+---
+
+# forced os variables
+- name: forced os variables
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ ansible_distribution }}-{{ ansible_machine | default("none") }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_release | default(0) }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.yml'
+        - '{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - 'main.yml'
+      paths:
+        - 'vars'
+  when: pf_enabled
+        and ansible_os_family | string in pf_os_family_supported
+  tags: [ pf ]
+
+# packages
+- name: packages (freebsd)
+  pkgng:
+    name: '{{ pf_packages_freebsd | default([]) }}'
+    state: '{{ pf_packages_freebsd_state | default("latest") }}'
+    cached: '{{ pf_packages_freebsd_cached | default(false) }}'
+  when: pf_enabled
+        and ansible_os_family | string in pf_os_family_supported
+        and ansible_os_family == 'FreeBSD'
+  tags: [ pf ]
+
+# rc
+- name: freebsd rc.conf.d pf (template)
+  template:
+    dest: '{{ pf_rc_pf_freebsd_file }}'
+    src: "{{ lookup('first_found', params) }}"
+    #
+    mode: '{{ pf_rc_pf_freebsd_file_mode | default(pf_file_mode) }}'
+    owner: '{{ pf_rc_pf_freebsd_file_owner | default(pf_owner) }}'
+    group: '{{ pf_rc_pf_freebsd_file_group | default(pf_group) }}'
+    backup: '{{ pf_rc_pf_freebsd_file_backup | default(pf_backup) }}'
+    validate: '{{ pf_rc_pf_freebsd_file_validate | default(omit) }}'
+  vars:
+    tpl_default: "rc.conf.d-{{ pf_rc_pf_freebsd_file | basename }}"
+    tpl_presence: '{{ pf_rc_pf_freebsd_file_template | default(tpl_default) }}'
+    params:
+      files:
+        - '{{ tpl_presence }}.{{ inventory_hostname }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_os_family }}.j2'
+        - '{{ tpl_presence }}.j2'
+        - '{{ tpl_presence }}.j2.in' # role default
+      paths:
+        - 'templates'
+  notify:
+    - restart_pf
+    - stop_pf
+  when: pf_enabled
+        and ansible_os_family | string in pf_os_family_supported
+        and ansible_os_family == 'FreeBSD'
+  tags: [ pf ]
+
+- name: freebsd rc.conf.d pflog (template)
+  template:
+    dest: '{{ pf_rc_pflog_freebsd_file }}'
+    src: "{{ lookup('first_found', params) }}"
+    #
+    mode: '{{ pf_rc_pflog_freebsd_file_mode | default(pf_file_mode) }}'
+    owner: '{{ pf_rc_pflog_freebsd_file_owner | default(pf_owner) }}'
+    group: '{{ pf_rc_pflog_freebsd_file_group | default(pf_group) }}'
+    backup: '{{ pf_rc_pflog_freebsd_file_backup | default(pf_backup) }}'
+    validate: '{{ pf_rc_pflog_freebsd_file_validate | default(omit) }}'
+  vars:
+    tpl_default: "rc.conf.d-{{ pf_rc_pflog_freebsd_file | basename }}"
+    tpl_presence: '{{ pf_rc_pf_freebsd_file_template | default(tpl_default) }}'
+    params:
+      files:
+        - '{{ tpl_presence }}.{{ inventory_hostname }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_os_family }}.j2'
+        - '{{ tpl_presence }}.j2'
+        - '{{ tpl_presence }}.j2.in' # role default
+      paths:
+        - 'templates'
+  notify:
+    - restart_pflog
+    - stop_pflog
+  when: pf_enabled
+        and ansible_os_family | string in pf_os_family_supported
+        and ansible_os_family == 'FreeBSD'
+  tags: [ pf ]
+
+# config
+- name: pf config
+  template:
+    dest: '{{ pf_cfg_file }}'
+    src: "{{ lookup('first_found', params) }}"
+    #
+    mode: '{{ pf_cfg_file_mode | default(pf_file_mode) }}'
+    owner: '{{ pf_cfg_file_owner | default(pf_owner) }}'
+    group: '{{ pf_cfg_file_group | default(pf_group) }}'
+    backup: '{{ pf_cfg_file_backup | default(pf_backup) }}'
+    validate: '{{ pf_cfg_file_validate | default(omit) }}'
+  vars:
+    tpl_default: '{{ pf_cfg_file | basename }}'
+    tpl_presence: '{{ pf_cfg_file_template | default(tpl_default) }}'
+    params:
+      files:
+        - '{{ tpl_presence }}.{{ inventory_hostname }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}-{{ ansible_distribution_major_version | default(0) }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_distribution }}.j2'
+        - '{{ tpl_presence }}.{{ ansible_os_family }}.j2'
+        - '{{ tpl_presence }}.j2'
+        - '{{ tpl_presence }}.j2.in' # role default
+      paths:
+        - 'templates'
+  notify:
+    - restart_pf
+  when: pf_enabled
+        and ansible_os_family | string in pf_os_family_supported
+  tags: [ pf ]
+
+# flush
+- name: flush handlers
+  meta: flush_handlers
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof

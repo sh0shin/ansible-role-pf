@@ -1,0 +1,8 @@
+# {{ pf_rc_pf_freebsd_file }}
+# {{ ansible_managed }}
+
+pf_enable="{% if pf_rc_pf_enable is sameas true %}YES{% else %}NO{% endif %}"
+pf_flags="{% if pf_rc_pf_flags %}{{ pf_rc_pf_flags }}{% endif %}"
+
+# vim: set sw=2 ts=2 et :
+# eof

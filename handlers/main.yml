@@ -1,0 +1,32 @@
+---
+
+- name: restart_pf
+  service:
+    name: '{{ pf_service_pf }}'
+    state: restarted
+  register: _restart_pf
+  until: _restart_pf is not failed
+  retries: 5
+  ignore_errors: yes
+  when: pf_rc_pf_enable
+
+- name: stop_pf
+  service:
+    name: '{{ pf_service_pf }}'
+    state: stopped
+  when: not pf_rc_pf_enable
+
+- name: restart_pflog
+  service:
+    name: '{{ pf_service_pflog }}'
+    state: restarted
+  when: pf_rc_pflog_enable
+
+- name: stop_pflog
+  service:
+    name: '{{ pf_service_pflog }}'
+    state: stopped
+  when: not pf_rc_pflog_enable
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof

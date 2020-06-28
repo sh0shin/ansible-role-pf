@@ -1,0 +1,59 @@
+# {{ pf_cfg_file }}
+# {{ ansible_managed }}
+
+{% if pf_cfg_macros                                                           %}
+# MACROS
+{%  for opt, val in pf_cfg_macros.items()                                     %}
+{{ opt }} = "{{ val }}"
+{%  endfor                                                                    %}
+
+{% endif                                                                      %}
+{% if pf_cfg_options                                                          %}
+# OPTIONS
+{%  for opt, val in pf_cfg_options.items()                                    %}
+set {{ opt }} {{ val }}
+{%  endfor                                                                    %}
+{% endif                                                                      %}
+{% if pf_cfg_skip                                                             %}
+set skip on { {{ pf_cfg_skip | join(' ') }} }
+
+{% endif                                                                      %}
+{% if pf_cfg_normalisation                                                    %}
+# NORMALISATION
+{% for opt, val in pf_cfg_normalisation.items()                               %}
+{%  for mval in val                                                           %}
+{{ opt }} {{ mval }}
+{%  endfor                                                                    %}
+{% endfor                                                                     %}
+
+{%  endif                                                                     %}
+{% if pf_cfg_queueing                                                         %}
+# QUEUEING
+
+{% endif                                                                      %}
+{% if pf_cfg_translation                                                      %}
+# TRANSLATION
+
+{% endif                                                                      %}
+{% if pf_cfg_tables                                                           %}
+# TABLES
+{%  for table in pf_cfg_tables                                                %}
+table <{{ table.name }}> {{ table.attributes }}
+{%  endfor                                                                    %}
+
+{% endif                                                                      %}
+{% if pf_cfg_anchors                                                          %}
+# ANCHORS
+
+{% endif                                                                      %}
+{% if pf_cfg_filtering                                                        %}
+# FILTERING
+{%  for opt, val in pf_cfg_filtering.items()                                  %}
+{%    for mval in val                                                         %}
+{{ opt }} {{ mval }}
+{%    endfor                                                                  %}
+{%  endfor                                                                    %}
+
+{% endif                                                                      %}
+# vim: set sw=2 ts=2 et :
+# eof

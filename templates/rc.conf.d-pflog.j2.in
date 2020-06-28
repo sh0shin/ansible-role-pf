@@ -1,0 +1,8 @@
+# {{ pf_rc_pflog_freebsd_file }}
+# {{ ansible_managed }}
+
+pflog_enable="{% if pf_rc_pflog_enable is sameas true %}YES{% else %}NO{% endif %}"
+pflog_flags="{% if pf_rc_pflog_flags %}{{ pf_rc_pflog_flags }}{% endif %}"
+
+# vim: set sw=2 ts=2 et :
+# eof

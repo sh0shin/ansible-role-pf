@@ -1,0 +1,76 @@
+---
+
+# enabled
+pf_enabled: no
+
+# mode/owner/group/backup defaults
+pf_file_mode: "0440"
+pf_dir_mode: "0750"
+pf_owner: "root"
+pf_group: "wheel"
+pf_backup: yes
+
+# packages
+pf_packages_freebsd: []
+pf_packages_openbsd: []
+
+pf_service_pf: "pf"
+pf_service_pflog: "pflog"
+
+# rc
+pf_rc_pf_freebsd_file: "/etc/rc.conf.d/pf"
+pf_rc_pflog_freebsd_file: "/etc/rc.conf.d/pflog"
+
+pf_rc_pf_enable: yes
+pf_rc_pf_flags: ''      # FreeBSD
+
+pf_rc_pflog_enable: yes
+pf_rc_pflog_flags: ''   # FreeBSD
+
+# misc
+pf_freebsd_update_cfg_file: "/etc/freebsd-update.conf"
+
+# config
+pf_cfg_file: "/etc/pf.conf"
+pf_cfg_file_validate: "pfctl -n -f %s"
+
+pf_cfg_macros:
+#  ext_if: "em0"
+#  range: "{ 90-123 }"
+#  ports: "{ 80 443 }"
+
+pf_cfg_options:
+  block-policy: return
+  optimization: normal
+  ruleset-optimization: basic
+  state-policy: if-bound
+
+pf_cfg_skip:
+  - lo
+  - lo0
+
+pf_cfg_normalisation: {}
+#  scrub:
+#    - all random-id fragment reassemble reassemble tcp
+
+pf_cfg_queueing: {} # TODO
+pf_cfg_translation: {} # TODO
+
+pf_cfg_tables:
+#  - name: private
+#    attributes: "const { 10/8, 172.16/12, 192.168/16 }"
+#  - name: badhosts
+#    attributes: persist
+
+pf_cfg_anchors: {} # TODO
+
+pf_cfg_filtering: {}
+#  block:
+#    - in log all
+#    - out log all
+#  pass:
+#    - in to (self)
+#    - out from (self)
+
+# vim: set syn=yaml sw=2 ts=2 et colorcolumn=160 :
+# eof
